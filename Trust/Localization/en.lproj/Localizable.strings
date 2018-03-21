@@ -109,7 +109,7 @@
 "settings.network.test.label.title" = "Test";
 "settings.network.test.warnning.title"="Warning";
 "settings.network.test.warnning.message"="You are switching to a test network where transactions are for testing purpose only";
-"settings.network.test.warnning.dont.show.again"="Don't show again";
+"settings.network.test.warnning.dont.show.again"="Don't Show Again";
 "settings.wallets.button.title" = "Wallets";
 "Symbol" = "Symbol";
 "Today" = "Today";
