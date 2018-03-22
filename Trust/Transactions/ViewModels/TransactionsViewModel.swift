@@ -3,9 +3,11 @@
 import Foundation
 import UIKit
 import RealmSwift
+import UserNotifications
 
 struct TransactionsViewModel {
-
+    private var numberOfReceivedTransactions: Int = 0
+    
     var title: String {
         return NSLocalizedString("transactions.tabbar.item.title", value: "Transactions", comment: "")
     }
@@ -125,6 +127,36 @@ struct TransactionsViewModel {
         self.network.transactions(for: session.account.address, startBlock: 1, page: 0, contract: nil) { result in
             guard let transactions = result.0 else { return }
             self.storage.add(transactions)
+
+            let transactionViewModels = transactions.map({ (trasaction: Transaction) -> TransactionViewModel in
+                return TransactionViewModel(
+                    transaction: trasaction,
+                    config: self.config,
+                    chainState: self.session.chainState,
+                    currentWallet: self.session.account
+                )
+            })
+            let newNumberOfReceivedTransactions = transactionViewModels.reduce(0) { (total, transactionViewModel: TransactionViewModel) in
+                total + (transactionViewModel.direction == TransactionDirection.incoming ? 1 : 0)
+            }
+
+            if self.numberOfReceivedTransactions < newNumberOfReceivedTransactions {
+                let notification = UNMutableNotificationContent()
+                notification.title = "News from Trust"
+                notification.subtitle = "New received transactions"
+                notification.body = "You have got new received transactions"
+                
+                let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 1, repeats: false)
+                let request = UNNotificationRequest(identifier: "test2", content: notification, trigger: trigger)
+                
+                UNUserNotificationCenter.current().add(request, withCompletionHandler: { (error: Error?) in
+                    if let e = error {
+                        print("Error handling local notification: \(e)")
+                        return
+                    }
+                    print("Local notification handled...")
+                })
+            }
         }
     }
 
