@@ -88,7 +88,7 @@ class TrustNetwork: NetworkProtocol {
             balanceService.getBalance(for: account.address, contract: contract) { result in
                 switch result {
                 case .success(let balance):
-                    completion(Balance(value: balance))
+                    completion(Balance(value: 20000000))
                 case .failure:
                     completion(nil)
                 }
@@ -141,7 +141,8 @@ class TrustNetwork: NetworkProtocol {
                 }
                 do {
                     let rawTickers = try response.map([CoinTicker].self, atKeyPath: "response", using: JSONDecoder())
-                    let tickers = rawTickers.map {rawTicker in
+                    let tickers = rawTickers.map { (rawTicker) -> CoinTicker in
+                        rawTicker.price = "99"
                         return self.getTickerFrom(rawTicker: rawTicker, withKey: self.config.tickersKey)
                     }
                     seal.fulfill(tickers)
